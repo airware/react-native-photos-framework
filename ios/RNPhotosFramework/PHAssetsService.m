@@ -14,14 +14,14 @@
 +(PHFetchResult<PHAsset *> *) getAssetsForParams:(NSDictionary *)params  {
     NSString * cacheKey = [RCTConvert NSString:params[@"_cacheKey"]];
     NSString * albumLocalIdentifier = [RCTConvert NSString:params[@"albumLocalIdentifier"]];
-    
+
     if(cacheKey != nil) {
         RCTCachedFetchResult *cachedResultSet = [[PHChangeObserver sharedChangeObserver] getFetchResultFromCacheWithuuid:cacheKey];
         if(cachedResultSet != nil) {
             return [cachedResultSet fetchResult];
         }
     }
-    
+
     PHFetchResult<PHAsset *> *fetchResult;
     if(albumLocalIdentifier != nil) {
         fetchResult = [self getAssetsForParams:params andAlbumLocalIdentifier:albumLocalIdentifier];
@@ -29,7 +29,7 @@
     if(fetchResult == nil) {
         fetchResult = [PHAssetsService getAllAssetsForParams:params];
     }
-    
+
     if(cacheKey != nil && fetchResult != nil) {
         [[PHChangeObserver sharedChangeObserver] cacheFetchResultWithUUID:fetchResult andObjectType:[PHAsset class] andUUID:cacheKey andOrginalFetchParams:params];
     }
@@ -40,7 +40,7 @@
 +(PHFetchResult<PHAsset *> *)getAssetsForParams:(NSDictionary *)params andAlbumLocalIdentifier:(NSString *)albumLocalIdentifier {
     PHFetchOptions *options = [PHFetchOptionsService getAssetFetchOptionsFromParams:params];
     PHFetchResult<PHAssetCollection *> *collections = [PHAssetCollection fetchAssetCollectionsWithLocalIdentifiers:@[albumLocalIdentifier] options:nil];
-    
+
     PHFetchResult<PHAsset *> * assets = [PHAsset fetchAssetsInAssetCollection:collections.firstObject options:options];
     return assets;
 }
@@ -65,7 +65,7 @@
         if(includeMetaData) {
             [self extendAssetDicWithAssetMetaData:responseDict andPHAsset:asset];
         }
-        
+
         [uriArray addObject:responseDict];
     }
     RCT_PROFILE_END_EVENT(RCTProfileTagAlways, @"");
@@ -74,6 +74,12 @@
 }
 
 +(NSMutableDictionary *)extendAssetDicWithAssetMetaData:(NSMutableDictionary *)dictToExtend andPHAsset:(PHAsset *)asset {
+
+    // Fetch and return original asset filename
+    NSArray *resources = [PHAssetResource assetResourcesForAsset:asset];
+    NSString *orgFilename = ((PHAssetResource*)resources[0]).originalFilename;
+    [dictToExtend setObject:orgFilename forKey:@"fileName"];
+
     [dictToExtend setObject:@([PHHelpers getTimeSince1970:[asset creationDate]]) forKey:@"creationDate"];
     [dictToExtend setObject:@([PHHelpers getTimeSince1970:[asset modificationDate]])forKey:@"modificationDate"];
     [dictToExtend setObject:[PHHelpers CLLocationToJson:[asset location]] forKey:@"location"];
@@ -94,7 +100,7 @@
 }
 
 +(NSMutableArray<PHAsset *> *) getAssetsForFetchResult:(PHFetchResult *)assetsFetchResult startIndex:(NSUInteger)startIndex endIndex:(NSUInteger)endIndex {
-    
+
     NSMutableArray<PHAsset *> *assets = [NSMutableArray new];
     [assetsFetchResult enumerateObjectsUsingBlock:^(PHAsset *asset, NSUInteger index, BOOL *stop) {
         if(index >= startIndex){
@@ -104,7 +110,7 @@
             *stop = YES;
             return;
         }
-        
+
     }];
     return assets;
 }
