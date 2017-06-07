@@ -77,8 +77,11 @@
 
     // Fetch and return original asset filename
     NSArray *resources = [PHAssetResource assetResourcesForAsset:asset];
-    NSString *orgFilename = ((PHAssetResource*)resources[0]).originalFilename;
-    [dictToExtend setObject:orgFilename forKey:@"fileName"];
+    
+    if (resources.count > 0) {
+        NSString *orgFilename = ((PHAssetResource*)resources[0]).originalFilename;
+        [dictToExtend setObject:orgFilename forKey:@"fileName"];
+    }
 
     [dictToExtend setObject:@([PHHelpers getTimeSince1970:[asset creationDate]]) forKey:@"creationDate"];
     [dictToExtend setObject:@([PHHelpers getTimeSince1970:[asset modificationDate]])forKey:@"modificationDate"];
