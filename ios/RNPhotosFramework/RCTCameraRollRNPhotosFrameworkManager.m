@@ -65,7 +65,7 @@ RCT_EXPORT_METHOD(getAssetsCount:(NSDictionary *) params
   PHFetchResult<PHAsset *> *assetsFetchResult = [PHAssetsService getAssetsForParams:params];
   
   resolve(@{
-            @"total" : assetsFetchResult.count,
+            @"total" : [NSNumber numberWithInt:assetsFetchResult.count],
             });
   RCT_PROFILE_END_EVENT(RCTProfileTagAlways, @"");
 }
@@ -90,7 +90,7 @@ RCT_EXPORT_METHOD(getAssets:(NSDictionary *)params
     BOOL includesLastAsset = endIndex >= (assetsFetchResult.count -1);
     resolve(@{
               @"assets" : [PHAssetsService assetsArrayToUriArray:assets andIncludeMetaData:includeMetaData],
-              @"total_count" : assetsFetchResult.count,
+              @"total_count" : [NSNumber numberWithInt: assetsFetchResult.count],
               @"includesLastAsset" : @(includesLastAsset)
               });
     RCT_PROFILE_END_EVENT(RCTProfileTagAlways, @"");
