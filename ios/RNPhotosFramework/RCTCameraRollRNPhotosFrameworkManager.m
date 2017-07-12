@@ -56,6 +56,20 @@ RCT_EXPORT_METHOD(requestAuthorization:(RCTPromiseResolveBlock)resolve
 }
 
 
+RCT_EXPORT_METHOD(getAssetsCount:(NSDictionary *) params
+                  resolve:(RCTPromiseResolveBlock)resolve
+                  reject:(RCTPromiseRejectBlock)reject)
+{
+  RCT_PROFILE_BEGIN_EVENT(0, @"-[RCTCameraRollRNPhotosFrameworkManager getAssetsCount", nil);
+  
+  PHFetchResult<PHAsset *> *assetsFetchResult = [PHAssetsService getAssetsForParams:params];
+  
+  resolve(@{
+            @"total" : assetsFetchResult.count,
+            });
+  RCT_PROFILE_END_EVENT(RCTProfileTagAlways, @"");
+}
+
 RCT_EXPORT_METHOD(getAssets:(NSDictionary *)params
                   resolve:(RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject)
@@ -76,6 +90,7 @@ RCT_EXPORT_METHOD(getAssets:(NSDictionary *)params
     BOOL includesLastAsset = endIndex >= (assetsFetchResult.count -1);
     resolve(@{
               @"assets" : [PHAssetsService assetsArrayToUriArray:assets andIncludeMetaData:includeMetaData],
+              @"total_count" : assetsFetchResult.count,
               @"includesLastAsset" : @(includesLastAsset)
               });
     RCT_PROFILE_END_EVENT(RCTProfileTagAlways, @"");
