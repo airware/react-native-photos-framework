@@ -64,6 +64,10 @@ class CameraRollRNPhotosFramework {
     return RCTCameraRollRNPhotosFrameworkManager.removeAssetsFromAlbum(params);
   }
 
+	getAssetsCount(params) {
+		return RCTCameraRollRNPhotosFrameworkManager.getAssetsCount(params);
+	}
+
   getAssets(params) {
     return RCTCameraRollRNPhotosFrameworkManager
       .getAssets(params)
@@ -72,6 +76,7 @@ class CameraRollRNPhotosFramework {
           assets: assetsResponse
             .assets
             .map(p => new Asset(p)),
+					total_count: assetsResponse.total_count,
           includesLastAsset: assetsResponse.includesLastAsset
         };
       });
